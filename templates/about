@@ -3,30 +3,20 @@
 {% block title %}About Us{% endblock %}
 
 {% block content %}
-    <h2>About Our Company</h2>
-    <p>We do amazing things here!</p>
-    <div id="v"></div>
-    <script>
-        var video = document.createElement('video');
-video.setAttribute('playsinline', '');
-video.setAttribute('autoplay', '');
-video.setAttribute('muted', '');
-video.style.width = '200px';
-video.style.height = '200px';
+<div style="width: 300px" id="reader"></div>
+<script src="static/js/html5-qrcode.min.js"></script>
+<script src="https://cdn.socket.io/4.8.1/socket.io.min.js" integrity="sha384-mkQ3/7FUtcGyoppY6bz/PORYoGqOl7/aSUMn2ymDOJcapfS6PHqxhRTMh1RR0Q6+" crossorigin="anonymous"></script>
+<script>
+  const socket = io();
 
-/* Setting up the constraint */
-var facingMode = "user"; // Can be 'user' or 'environment' to access back or front camera (NEAT!)
-var constraints = {
-  audio: false,
-  video: {
-   facingMode: facingMode
-  }
-};
+function onScanSuccess(decodedText, decodedResult) {
+    // Handle on success condition with the decoded text or result.
+    console.log(`Scan result: ${decodedText}`, decodedResult);
+    socket.emit('message', decodedText);
+}
 
-/* Stream it to video element */
-navigator.mediaDevices.getUserMedia(constraints).then(function success(stream) {
-  video.srcObject = stream;
-});
-document.getElementById('v').appendChild(video);
-    </script>
+var html5QrcodeScanner = new Html5QrcodeScanner(
+    "reader", { fps: 10, qrbox: 250, formatsToSupport: [Html5QrcodeSupportedFormats.AZTEC] });
+html5QrcodeScanner.render(onScanSuccess);
+</script>
 {% endblock %}
